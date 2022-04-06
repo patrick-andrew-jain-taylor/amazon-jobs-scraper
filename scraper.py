@@ -40,20 +40,21 @@ class Scraper:
         Getting job name, ID and location.
         Then, creating the URL of each job ID.
         """
-        positions_list = []
         info_list = []
 
-        for info in soup.findAll('div', {'class': 'info first col-12 col-md-8'}):
-            positions_list.append(info)
+        positions_list = list(
+            soup.findAll('div', {'class': 'info first col-12 col-md-8'})
+        )
+
+        # Getting job title from the HTML
+        regex = (r'job-title">([^<]+)')
+        # Getting location from the HTML
+        regex2 = (r'location-and-id">([^|]+)')
+        # Getting job ID from the HTML
+        regex3 = (r'Job ID: ([^<]+)')
         # print(positions_list)  # Debug
 
         for elem in positions_list:
-            # Getting job title from the HTML
-            regex = (r'job-title">([^<]+)')
-            # Getting location from the HTML
-            regex2 = (r'location-and-id">([^|]+)')
-            # Getting job ID from the HTML
-            regex3 = (r'Job ID: ([^<]+)')
             job_title = re.findall(regex, str(elem))
             location = re.findall(regex2, str(elem))
             job_id = re.findall(regex3, str(elem))
@@ -62,8 +63,9 @@ class Scraper:
                 'job_title': job_title[0],
                 'location': location[0],
                 'job_id': job_id[0],
-                'job_url': 'https://www.amazon.jobs/en/jobs/' + str(job_id[0])
+                'job_url': f'https://www.amazon.jobs/en/jobs/{str(job_id[0])}',
             }
+
             # Appending every dictionary created to the list
             info_list.append(info_dict)
 
@@ -88,12 +90,11 @@ class Scraper:
     @staticmethod
     def get_chrome_drivers() -> str:
         if sys.platform.startswith('linux'):
-            driver_path = WEBDRIVER_PATH_MAC
+            return WEBDRIVER_PATH_MAC
         elif sys.platform.startswith('win'):
-            driver_path = WEBDRIVER_PATH_WIN
+            return WEBDRIVER_PATH_WIN
         else:
-            driver_path = "OS not supported."
-        return driver_path
+            return "OS not supported."
 
 
 if __name__ == '__main__':
